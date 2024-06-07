@@ -4,6 +4,7 @@ import { Button } from "@rneui/base";
 import { StatusBar } from 'expo-status-bar';
 import * as Location from 'expo-location';
 import harvesine from 'haversine-distance';
+import { PaperProvider } from "react-native-paper";
 
 export default function HomeScreen() {
     const [travel, setTravel] = useState({
@@ -81,22 +82,24 @@ export default function HomeScreen() {
       }, [monitor])
 
       return (
-    <View style={styles.container}>
-        {/* <Text style={styles.milesHeading}>Distance Travelled</Text> */}
-        <View style={[{width: '100%', flexDirection: 'row', justifyContent: 'center', alignContent: 'flex-end', alignItems: 'center'}]}>
-          <Text style={styles.milesHeading}>{(travel.totalDistance * 0.000621371).toFixed(1)}</Text>
-          <Text style={[{marginLeft: 10}]}>miles</Text>
-        </View>
+        <PaperProvider>
+            <View style={styles.container}>
+            {/* <Text style={styles.milesHeading}>Distance Travelled</Text> */}
+            <View style={[{width: '100%', flexDirection: 'row', justifyContent: 'center', alignContent: 'flex-end', alignItems: 'center'}]}>
+            <Text style={styles.milesHeading}>{(travel.totalDistance * 0.000621371).toFixed(1)}</Text>
+            <Text style={[{marginLeft: 10}]}>miles</Text>
+            </View>
 
-        <View>
-          <Button disabled={monitor} type="clear" titleStyle={styles.startButton} onPress={() => setMonitor(true)}>Start</Button>
+            <View>
+            <Button disabled={monitor} type="clear" titleStyle={styles.startButton} onPress={() => setMonitor(true)}>Start</Button>
 
-          <Button disabled={!monitor} type='clear'titleStyle={styles.endButton} onPress={() => setMonitor(false)}>End</Button>
-        </View>
-        
-        {/* <Text>{travel.totalDistance} metres</Text> */}
-        <StatusBar style="auto" />
-      </View>
+            <Button disabled={!monitor} type='clear'titleStyle={styles.endButton} onPress={() => setMonitor(false)}>End</Button>
+            </View>
+            
+            {/* <Text>{travel.totalDistance} metres</Text> */}
+            <StatusBar style="auto" />
+            </View>
+        </PaperProvider>
       );
 }
 
