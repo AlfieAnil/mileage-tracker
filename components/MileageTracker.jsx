@@ -1,14 +1,16 @@
-import { View, Text, StyleSheet, Alert } from "react-native";
+import { View, StyleSheet, Alert, Button as RButton, Pressable } from "react-native";
 import { useState, useEffect } from "react";
 import { StatusBar } from 'expo-status-bar';
 import * as Location from 'expo-location';
 import harvesine from 'haversine-distance';
-import { Dialog, Modal, PaperProvider, Portal, TextInput, Button, Snackbar } from "react-native-paper";
+import { Dialog, Modal, PaperProvider, Portal, TextInput, Button, Snackbar, Text } from "react-native-paper";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { addDoc, collection, doc } from "firebase/firestore";
 import { auth, db } from "../firebaseConfig";
+import { useTheme } from 'react-native-paper';
 
 export default function HomeScreen() {
+    const theme = useTheme();
     const [travel, setTravel] = useState({
         'positions': [],
         'totalDistance': 0
@@ -48,13 +50,19 @@ export default function HomeScreen() {
           console.log("Status: ", status);
     
           if (status !== 'granted') {
+            setMonitor(false);
             alert("Location permission is required for this app");
             return;
           }
     
           // shows what to use for background
           // Subscribe to location updates from the device. Please note that updates will only occur while the application is in the foreground. To get location updates while in background you'll need to use Location.startLocationUpdatesAsync.
-          
+          Location.startLocationUpdatesAsync({
+            accuracy: Location.Accuracy.High,
+            timeInterval: 1000,
+            distanceInterval: 1
+          }, (position) => {console.log("Background Position: ", position)});
+
            Location.watchPositionAsync({
             accuracy: Location.Accuracy.High,
             timeInterval: 1000,
@@ -164,20 +172,30 @@ export default function HomeScreen() {
 
             <View style={styles.container}>
             {/* <Text style={styles.milesHeading}>Distance Travelled</Text> */}
-            <View style={[{width: '100%', flexDirection: 'row', justifyContent: 'center', alignContent: 'flex-end', alignItems: 'center'}]}>
-            <Text style={styles.milesHeading}>{(travel.totalDistance * 0.000621371).toFixed(1)}</Text>
-            <Text style={[{marginLeft: 10}]}>miles</Text>
-            </View>
+                <View style={[{width: '100%', flexDirection: 'row', justifyContent: 'center', alignContent: 'flex-end', alignItems: 'center'}]}>
+                    <Text style={styles.milesHeading}>{(travel.totalDistance * 0.000621371).toFixed(1)}</Text>
+                    <Text style={[{marginLeft: 10}]}>miles</Text>
+                </View>
 
-            <View>
-            <Button disabled={monitor} type="clear" titleStyle={styles.startButton} onPress={() => setMonitor(true)}>Start</Button>
+                <View style={{justifyContent: 'center', alignItems: 'center'}}>
+                    {/* <Pressable disabled={monitor} onPress={() => setMonitor(true)} title="Start" labelStyle={styles.startButton} >
+                        <Text style={styles.startButton}>Start</Text>
+                    </Pressable>
 
-            <Button disabled={!monitor} type='clear'titleStyle={styles.endButton} onPress={() => {setMonitor(false); checkEndTrip()}}>End</Button>
+                    <Pressable disabled={!monitor} onPress={() => {setMonitor(false); checkEndTrip()}}>
+                        <Text style={styles.endButton}>End</Text>
+                    </Pressable> */}
 
-            {/* <Button type="clear" onPress={findDestination}>Find Destination</Button> */}
-            </View>
+                    <Button mode="contained" style={{marginTop: 16, paddingHorizontal: 10, backgroundColor: monitor ? 'red': theme.colors.primary}} onPress={() => {
+                        if(monitor) {
+                            setMonitor(false);
+                            checkEndTrip();
+                        } else {
+                            setMonitor(true);
+                        }
+                    }}>{monitor ? 'End': 'Start'}</Button>
+                </View>
             
-            {/* <Text>{travel.totalDistance} metres</Text> */}
             <StatusBar style="auto" />
 
             <Snackbar visible={snackbarVisible} onDismiss={() => setSnackBarVisible(false)} action={{label: 'Okay', onPress: () => setSnackBarVisible(false)}}>{snackbarText}</Snackbar>
@@ -201,13 +219,15 @@ const styles = StyleSheet.create({
     },
   
     startButton: {
-      fontSize: 25,
-      marginTop: 35
+      fontSize: 28,
+      color: "blue",
+      marginTop: 24
     },
   
     endButton: {
-      fontSize: 20,
-      color: "red"
+      fontSize: 24,
+      color: "red",
+      marginTop: 16
     },
 
     promptHeading: {

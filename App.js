@@ -10,9 +10,10 @@ import { createDrawerNavigator, DrawerItem } from '@react-navigation/drawer';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreen from './components/MileageTracker';
 import SignUp from './components/authentication/sign-up';
-import { auth } from './firebaseConfig';
+import { app, auth } from './firebaseConfig';
 import SignIn from './components/authentication/sign-in';
 import LogoutScreen from './components/authentication/log-out';
+import { getAuth } from 'firebase/auth';
 
 function NotificationsScreen({ navigation }) {
   return (
@@ -31,16 +32,16 @@ const Drawer = createDrawerNavigator();
 
 
 export default function App() {
-  const [authenticated, setAuthenticated] = useState(false);
-
+  const [authenticated, setAuthenticated] = useState(null);
+  const appAuth = getAuth(app);
   useEffect(() => {
-    auth.onAuthStateChanged(() => {
-      console.log("current user = ", auth.currentUser);
-      setAuthenticated(auth.currentUser !== null)
+    getAuth(app).onAuthStateChanged((user) => {
+      console.log("current user = ", user);
+      setAuthenticated(appAuth.currentUser !== null)
     })
   }, [])
 
-  if (!authenticated) {
+  if (authenticated === false) {
     return (
       <NavigationContainer>
         <Stack.Navigator initialRouteName='Sign-up'>
@@ -51,17 +52,19 @@ export default function App() {
     )
   }
 
-  return (
-    <NavigationContainer>
+  if (authenticated === true) {
+    return (
+      <NavigationContainer>
 
-      <Drawer.Navigator initialRouteName='Home'>
-        <Drawer.Screen name='Home' component={HomeScreen} />
-        
-        <Drawer.Screen name='Logout' component={LogoutScreen} options={{drawerLabelStyle: {color: "red"}}} />
-      </Drawer.Navigator>
+        <Drawer.Navigator initialRouteName='Home'>
+          <Drawer.Screen name='Home' component={HomeScreen} />
+          
+          <Drawer.Screen name='Logout' component={LogoutScreen} options={{drawerLabelStyle: {color: "red"}}} />
+        </Drawer.Navigator>
 
-    </NavigationContainer>
-  );
+      </NavigationContainer>
+    );
+  }
 }
 
 
