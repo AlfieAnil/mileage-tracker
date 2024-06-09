@@ -14,6 +14,7 @@ import { app, auth } from './firebaseConfig';
 import SignIn from './components/authentication/sign-in';
 import LogoutScreen from './components/authentication/log-out';
 import { getAuth } from 'firebase/auth';
+import MileageReview from './components/MileageReview';
 
 function NotificationsScreen({ navigation }) {
   return (
@@ -58,6 +59,7 @@ export default function App() {
 
         <Drawer.Navigator initialRouteName='Home'>
           <Drawer.Screen name='Home' component={HomeScreen} />
+          <Drawer.Screen name='My Travels' component={MileageReview} />
           
           <Drawer.Screen name='Logout' component={LogoutScreen} options={{drawerLabelStyle: {color: "red"}}} />
         </Drawer.Navigator>
