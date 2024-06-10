@@ -36,3 +36,6 @@ yarn-error.*
 
 # Firebase Files
 firebaseConfig.js
+
+# Google Play Files
+google-play-service-mileseasier.json
